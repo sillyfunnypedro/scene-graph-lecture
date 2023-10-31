@@ -1,3 +1,5 @@
+import ScenesManager from './ScenesManager';
+
 import basicScene from './scenes/basic.scene';
 
 
@@ -7,9 +9,10 @@ import basicScene from './scenes/basic.scene';
 
 
 const sceneSourceMap = new Map<string, string>();
+const scenesManager = ScenesManager.getInstance();
 
 
-function loadScene(sceneName: string, sceneSource: string) {
+async function loadSceneSourceFile(sceneName: string, sceneSource: string) {
     sceneSourceMap.set(sceneName, "__loading__");
     fetch(sceneSource)
         .then(
@@ -21,6 +24,7 @@ function loadScene(sceneName: string, sceneSource: string) {
             console.log('*********** Source Code Here *****************************')
             console.log(data);
             console.log('************ End of Source  ******************************')
+            scenesManager.parseSceneFile(sceneName, data);
             sceneSourceMap.set(sceneName, data);
         })
         .catch(error => {
@@ -36,8 +40,8 @@ export function getSceneSource(sceneName: string): string | undefined {
 
 
 
-export function loadAndCacheScenes() {
+export function loadAndCacheSceneSourceFiles() {
     console.log('In loadAndCacheScenes');
-    loadScene('basic', basicScene);
+    loadSceneSourceFile('basic', basicScene);
 
 }

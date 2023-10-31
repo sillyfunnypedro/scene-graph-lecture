@@ -8,14 +8,14 @@ import ObjFileLoader from './ObjFileLoader';
 import ModelGL from './ModelGL'
 import { updateSceneData, setupCanvas } from './glCanvas';
 import { loadAndCacheShaderSource } from './ShaderManager';
-import { loadAndCacheScenes, getSceneSource } from './SceneLoader';
+import { loadAndCacheSceneSourceFiles, getSceneSource } from './SceneSourceFileLoader';
 
 const objLoader = ObjFileLoader.getInstance();
 
 
 // Kick off the loading of the shader source and the scene source
 loadAndCacheShaderSource();
-loadAndCacheScenes();
+loadAndCacheSceneSourceFiles();
 
 
 function App() {

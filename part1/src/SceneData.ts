@@ -14,10 +14,16 @@ class SceneData {
     // Store the WebGL rendering context
     glContext: WebGLRenderingContext | null = null;
 
+
     // Store the primary camera
     camera: Camera | null = null;
     model: ModelGL | null = null;
-    models: Array<ModelGL> = [];
+    // a map of models indexed by string name
+    models: Map<string, ModelGL> = new Map<string, ModelGL>();
+    lights: GLLights = new GLLights();
+
+
+    source: string = '__loading__';
 
     // store the canvas width and height.
     width: number = 0;
@@ -28,7 +34,7 @@ class SceneData {
     renderMode: string = "solid";
     frameNumber: number = 0;
 
-    lights: GLLights = new GLLights();
+
 
 }
 

@@ -66,6 +66,16 @@ class Camera {
         this.updateCamera();
     }
 
+    public setLookAt(lookAt: vec3): void {
+        this.lookAt = lookAt;
+        this.updateCamera();
+    }
+
+    public setUpVector(upVector: vec3): void {
+        this.upVector = upVector;
+        this.updateCamera();
+    }
+
     public moveForward(distance: number): void {
         let lookDirection = vec3.create();
         vec3.subtract(lookDirection, this.lookAt, this.eyePosition);
@@ -173,17 +183,7 @@ class Camera {
     }
 
 
-    public setLookAt(lookAt: vec3): void {
-        this.lookAt = lookAt;
-        this.updateCamera();
-    }
 
-
-
-    public setUpVector(upVector: vec3): void {
-        this.upVector = upVector;
-        this.updateCamera();
-    }
 
     public setAspectRatio(aspectRatio: number): void {
         this.aspectRatio = aspectRatio;

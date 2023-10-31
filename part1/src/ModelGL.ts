@@ -20,6 +20,7 @@ class ModelGL {
     materialFile?: string = undefined;
     material?: Material = undefined;
     modelPath: string = '';
+    modelName: string = '';
     shaderName: string = '';
 
 
@@ -39,6 +40,7 @@ class ModelGL {
 
 
     renderingProgram: WebGLProgram | null = null;
+    loaded: boolean = false;
 
 
     public get hasDiffuseMap(): boolean {
@@ -55,7 +57,7 @@ class ModelGL {
     // make it simpler to determine what maps to use for the model
 
     public get hasNormalMap(): boolean {
-        if (this.material == undefined) {
+        if (this.material === undefined) {
             return false;
         }
 
