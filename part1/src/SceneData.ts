@@ -24,6 +24,7 @@ class SceneData {
 
 
     source: string = '__loading__';
+    name: string = '';
 
     // store the canvas width and height.
     width: number = 0;
@@ -33,6 +34,17 @@ class SceneData {
 
     renderMode: string = "solid";
     frameNumber: number = 0;
+
+    modelsLoading = 0;
+    modelsLoaded = 0;
+
+    sceneLoaded(): boolean {
+        if (this.modelsLoading === 0) {
+            return false;
+        }
+
+        return this.modelsLoading === this.modelsLoaded;
+    }
 
 
 

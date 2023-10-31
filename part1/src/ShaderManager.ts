@@ -22,11 +22,11 @@ function loadShader(shaderName: string, shaderSource: string) {
     fetch(shaderSource)
         .then(response => response.text())
         .then(data => {
-            console.log('**********************************************************')
-            console.log(`loaded ${shaderName}`);
-            console.log('*********** Source Code Here *****************************')
-            console.log(data);
-            console.log('************ End of Source  ******************************')
+            // console.log('**********************************************************')
+            // console.log(`loaded ${shaderName}`);
+            // console.log('*********** Source Code Here *****************************')
+            // console.log(data);
+            // console.log('************ End of Source  ******************************')
             shaderSourceCodeMap.set(shaderName, data);
         })
         .catch(error => {

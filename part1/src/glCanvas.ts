@@ -7,6 +7,7 @@ import PPMFileLoader from './PPMFileLoader';
 
 import shaderSourceCodeMap from './ShaderManager';
 import SceneData from './SceneData';
+import ScenesManager from './ScenesManager';
 import { GLPointLight, GLLights } from './GLLights';
 
 
@@ -17,6 +18,10 @@ let frameNumber = 0;
 
 
 const sceneData = new SceneData();
+const scenesManager = ScenesManager.getInstance();
+
+console.log('In glCanvas.ts', `found ${scenesManager.getScenes().length} scenes`);
+console.log('All the scenes are loaded', scenesManager.scenesLoaded());
 
 function linearLight(point1: number[], point2: number[], lights: number, color: number[]) {
     let deltaX = (point2[0] - point1[0]) / (lights - 1);
@@ -456,7 +461,18 @@ function setUpVertexBuffer(gl: WebGLRenderingContext,
 }
 
 
+function checkForUpdates(): void {
+    if (!scenesManager.scenesLoaded()) {
+        requestAnimationFrame(checkForUpdates);
+        console.log('waiting for scenes to load');
+    }
 
+    const sceneName = scenesManager.getActiveScene();
+    const scene = scenesManager.getScene(sceneName);
+    const model = scene?.model;
+
+    requestAnimationFrame(renderLoop);
+}
 
 function renderLoop(): void {
 
@@ -619,5 +635,5 @@ function renderLoop(): void {
         lastTime = now;
     }
 
-    requestAnimationFrame(renderLoop);
+    requestAnimationFrame(checkForUpdates);
 }

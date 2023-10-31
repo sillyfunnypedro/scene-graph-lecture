@@ -6,6 +6,7 @@ import { GLPointLight, GLDirectionalLight, GLSpotLight, GLLights } from "./GLLig
 import { vec3 } from "gl-matrix";
 
 
+
 // Manage the scenes for the different classes.
 // This class is a singleton.
 // it is responsible for cleaning up between scenes when a scene is changed.
@@ -111,8 +112,9 @@ class ScenesManager {
         // The commands can be in any order.
 
         let resultingScene = new SceneData();
+        resultingScene.name = sceneName;
         this._scenes.set(sceneName, resultingScene);
-        if (this._activeScene ===""){
+        if (this._activeScene === "") {
             this.setActiveScene(sceneName);
         }
         resultingScene.camera = new Camera();
@@ -235,14 +237,32 @@ class ScenesManager {
 
     }
 
-    processObjectCommand(scene: SceneData, parameters: string[]) {
+    async processObjectCommand(scene: SceneData, parameters: string[]) {
         // object name objfile
         let objectName = parameters[0];
         let objectFile = parameters[1];
+        const objFileLoader = ObjFileLoader.getInstance();
 
-        let newModel = new ModelGL();
-        newModel.modelPath = objectFile;
-        scene.models.set(objectName, newModel);
+        scene.modelsLoading += 1;
+        if (objectFile === undefined) {
+            throw new Error(`object file undefined for ${objectName}`);
+        }
+        let newModel = await objFileLoader.getModel(objectFile);
+        if (newModel !== undefined) {
+            scene.models.set(objectName, newModel);
+        }
+        scene.modelsLoaded += 1;
+    }
+
+    scenesLoaded(): boolean {
+        if (this._scenes.size === 0)
+            return false;
+        for (let scene of this._scenes.values()) {
+            if (!scene.sceneLoaded()) {
+                return false;
+            }
+        }
+        return true;
     }
 
 

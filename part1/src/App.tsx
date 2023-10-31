@@ -11,6 +11,8 @@ import { loadAndCacheShaderSource } from './ShaderManager';
 
 import { loadAndCacheSceneSourceFiles } from './SceneSourceFileLoader';
 
+import ScenesManager from './ScenesManager';
+
 const objLoader = ObjFileLoader.getInstance();
 
 
@@ -20,6 +22,9 @@ const objLoader = ObjFileLoader.getInstance();
 loadAndCacheShaderSource();
 loadAndCacheSceneSourceFiles();
 
+
+
+console.log('ScenesManager', ScenesManager.getInstance().scenesLoaded());
 
 
 function App() {
