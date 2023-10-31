@@ -39,6 +39,7 @@ function ControlComponent({ renderObject,
     const [scaleY, setScaleY] = useState(modelGL?.scaleY ?? 1);
     const [scaleZ, setScaleZ] = useState(modelGL?.scaleZ ?? 1);
     const [uniformScale, setUniformScale] = useState(true);
+    const [sceneName, setSceneName] = useState("")
 
 
     function updateState() {
@@ -167,6 +168,11 @@ function ControlComponent({ renderObject,
         updateState();
 
 
+    }
+
+    function updateSceneName(sceneName: string) {
+        scenesManager.setActiveScene(sceneName);
+        setSceneName(sceneName);
     }
 
 
@@ -328,7 +334,7 @@ function ControlComponent({ renderObject,
                                     <React.Fragment key={scene}>
                                         <button
                                             key={scene}
-                                            onClick={() => scenesManager.setActiveScene(scene)}
+                                            onClick={() => updateSceneName(scene)}
                                             style={{
                                                 backgroundColor: (scene === currentScene) ? 'blue' : 'gray',
                                             }}

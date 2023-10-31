@@ -112,6 +112,9 @@ class ScenesManager {
 
         let resultingScene = new SceneData();
         this._scenes.set(sceneName, resultingScene);
+        if (this._activeScene ===""){
+            this.setActiveScene(sceneName);
+        }
         resultingScene.camera = new Camera();
         resultingScene.model = new ModelGL();
 
