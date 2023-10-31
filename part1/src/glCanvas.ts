@@ -99,19 +99,16 @@ export function updateSceneData(model: ModelGL | null, camera: Camera | null): v
 
     sceneData.camera = camera;
     sceneData.model = model;
+    sceneData.models.set('test-model', model!);
     if (model !== null && camera !== null) {
         renderLoop();
     }
 }
 
-function compileProgram(gl: WebGLRenderingContext): WebGLProgram | null {
-    if (!sceneData.model) {
-        return null;
-    }
+function compileProgram(gl: WebGLRenderingContext, model: ModelGL) {
 
-    if (sceneData.model.renderingProgram !== null) {
-        return sceneData.model.renderingProgram;
-    }
+
+
     if (!sceneData.camera) {
         return null;
     }
@@ -122,8 +119,8 @@ function compileProgram(gl: WebGLRenderingContext): WebGLProgram | null {
 
 
 
-    const vertexShaderName = sceneData.model.getVertexShaderName();
-    const fragmentShaderName = sceneData.model.getFragmentShaderName();
+    const vertexShaderName = model.getVertexShaderName();
+    const fragmentShaderName = model.getFragmentShaderName();
 
 
     console.log("Compiling " + vertexShaderName + " and " + fragmentShaderName);
@@ -213,8 +210,8 @@ function compileProgram(gl: WebGLRenderingContext): WebGLProgram | null {
         return null;
     }
     // cache the shader program
-    sceneData.model.renderingProgram = shaderProgram;
-    return shaderProgram;
+    model.shaderProgram = shaderProgram;
+
 }
 
 /** 
@@ -503,32 +500,32 @@ function renderLoop(): void {
     // the compileProgram will store the compiled program in the 
     // current model in sceneData
     // ******************************************************
-    const shaderProgram = compileProgram(gl);
+    compileProgram(gl, model!);
 
-    if (!shaderProgram) {
+    if (!model!.shaderProgram) {
         return;
     }
     // use the shader program
-    gl.useProgram(shaderProgram);
+    gl.useProgram(model.shaderProgram);
 
 
 
 
 
-    setUpVertexBuffer(gl, model, shaderProgram);
+    setUpVertexBuffer(gl, model, model.shaderProgram!);
 
-    setUpLights(gl, shaderProgram);
+    setUpLights(gl, model.shaderProgram!);
 
 
     // SetUpTextures will set up any textures required by the model.
-    setUpTextures(gl, model, shaderProgram)
+    setUpTextures(gl, model, model.shaderProgram!)
 
 
     const vertexShaderName = model.getVertexShaderName();
     // check to see if Normal is in the shader name
     if (vertexShaderName.includes('Normal')) {
         // get the normal attribute location
-        const normalLocation = gl.getAttribLocation(shaderProgram, 'normal');
+        const normalLocation = gl.getAttribLocation(model.shaderProgram!, 'normal');
 
         // enable the normal attribute
 
@@ -545,13 +542,13 @@ function renderLoop(): void {
 
 
     // get the projection matrix location
-    const projectionMatrixLocation = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
+    const projectionMatrixLocation = gl.getUniformLocation(model.shaderProgram!, 'projectionMatrix');
 
     // set the projection matrix
     gl.uniformMatrix4fv(projectionMatrixLocation, false, camera.projectionMatrix);
 
     // get the view matrix location
-    const viewMatrixLocation = gl.getUniformLocation(shaderProgram, 'viewMatrix');
+    const viewMatrixLocation = gl.getUniformLocation(model.shaderProgram!, 'viewMatrix');
 
     // set the view matrix
     gl.uniformMatrix4fv(viewMatrixLocation, false, camera.viewMatrix);
@@ -564,7 +561,7 @@ function renderLoop(): void {
 
 
     // get the model matrix location
-    const modelMatrixLocation = gl.getUniformLocation(shaderProgram, 'modelMatrix');
+    const modelMatrixLocation = gl.getUniformLocation(model.shaderProgram!, 'modelMatrix');
 
     // set the model matrix
     gl.uniformMatrix4fv(modelMatrixLocation, false, modelMatrix);

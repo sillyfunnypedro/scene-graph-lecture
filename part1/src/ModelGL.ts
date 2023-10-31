@@ -39,7 +39,7 @@ class ModelGL {
     textures: Map<string, string> = new Map<string, string>();
 
 
-    renderingProgram: WebGLProgram | null = null;
+    shaderProgram: WebGLProgram | null = null;
     loaded: boolean = false;
 
 

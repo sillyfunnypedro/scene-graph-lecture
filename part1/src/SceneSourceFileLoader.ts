@@ -1,5 +1,6 @@
 import basic_triangle from './scenes/basic_triangle.scene';
 import textured_triangle from './scenes/textured_triangle.scene';
+import normal_square from './scenes/normal_square.scene';
 import ScenesManager from './ScenesManager';
 
 
@@ -33,5 +34,6 @@ export function loadAndCacheSceneSourceFiles() {
     console.log('In loadAndCacheScenes');
     loadSceneSourceFile('basic_triangle', basic_triangle);
     loadSceneSourceFile('textured_triangle', textured_triangle);
+    loadSceneSourceFile('normal_square', normal_square)
 
 }
