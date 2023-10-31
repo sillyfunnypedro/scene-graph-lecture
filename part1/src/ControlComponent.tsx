@@ -1,12 +1,17 @@
 import { objectFileMap } from './ObjectFileMap';
+import ScenesManager from './ScenesManager';
 import React, { useState, useEffect } from 'react';
 import LocalServerStatus from './LocalServerStatus';
 import ModelGl from './ModelGL';
 
-
+// Styles for the sliders
 import './ControlComponent.css';
 
-/** two buttons for the first part of the assignment */
+
+
+// Instantiate the ScenesManager
+
+const scenesManager = ScenesManager.getInstance();
 
 
 // define the ControlComponentProps interface
@@ -295,6 +300,55 @@ function ControlComponent({ renderObject,
     }
 
     /**
+     * make the buttons for the scenes
+     * 
+     * @returns HTML component with as many buttons as there are scenes
+     */
+    function makeScenesButtons() {
+        const scenes = scenesManager.getScenes();
+
+        const currentScene = scenesManager.getActiveScene();
+        let buttonCount = 0;
+        // put five buttons on a row
+        function makeRow() {
+            buttonCount += 1;
+            if (buttonCount % 5 === 0) {
+                return <br />;
+            }
+        }
+
+        return (
+            <div>
+                <table className="tableWidth">
+                    <thead>
+                        <tr>
+                            <th className="leftAlign">Scenes:</th>
+                            <th className="rightAlign">
+                                {scenes.map((scene) => (
+                                    <React.Fragment key={scene}>
+                                        <button
+                                            key={scene}
+                                            onClick={() => scenesManager.setActiveScene(scene)}
+                                            style={{
+                                                backgroundColor: (scene === currentScene) ? 'blue' : 'gray',
+                                            }}
+                                        >
+                                            {scene}
+                                        </button>
+                                        {makeRow()}
+                                    </React.Fragment>
+
+                                ))}
+
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        );
+    }
+
+    /**
      * 
      * @param string[]
      * 
@@ -376,6 +430,8 @@ function ControlComponent({ renderObject,
                         <th className="leftAlign">
                             <hr className="lineWidth" />
                             <LocalServerStatus />
+                            <hr className="lineWidth" />
+                            {makeScenesButtons()}
                             <hr className="lineWidth" />
                             {makeObjectButtons("Objects:", renderObject, updateRenderObject)}
                             <hr className="lineWidth" />

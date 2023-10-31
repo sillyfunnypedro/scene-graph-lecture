@@ -8,14 +8,18 @@ import ObjFileLoader from './ObjFileLoader';
 import ModelGL from './ModelGL'
 import { updateSceneData, setupCanvas } from './glCanvas';
 import { loadAndCacheShaderSource } from './ShaderManager';
-import { loadAndCacheSceneSourceFiles, getSceneSource } from './SceneSourceFileLoader';
+
+import { loadAndCacheSceneSourceFiles } from './SceneSourceFileLoader';
 
 const objLoader = ObjFileLoader.getInstance();
+
+
 
 
 // Kick off the loading of the shader source and the scene source
 loadAndCacheShaderSource();
 loadAndCacheSceneSourceFiles();
+
 
 
 function App() {
@@ -33,10 +37,6 @@ function App() {
   const [modelGL, setModelGL] = useState<ModelGL | null>(null);
 
   const [camera, setCamera] = useState(new Camera());
-
-  const scene = getSceneSource('basic');
-  console.log(scene);
-
 
 
   useEffect(() => {

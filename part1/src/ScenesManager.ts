@@ -13,6 +13,7 @@ import { vec3 } from "gl-matrix";
 class ScenesManager {
     private _scenes: Map<string, SceneData> = new Map<string, SceneData>();
     private _objLoader = ObjFileLoader.getInstance();
+    private _activeScene: string = "";
 
     private static _instance: ScenesManager;
 
@@ -28,12 +29,30 @@ class ScenesManager {
         return ScenesManager._instance;
     }
 
-    getAvailableScenes(): string[] {
+
+    // The scene getter.  This will return the scene data for the active scene.
+    getScene(sceneName: string): SceneData | undefined {
+        return this._scenes.get(sceneName);
+    }
+
+
+    // functions for the UI.  These functions are called by the UI
+    getScenes(): string[] {
         return Array.from(this._scenes.keys());
     }
 
-    getScene(sceneName: string): SceneData | undefined {
-        return this._scenes.get(sceneName);
+
+    getActiveScene(): string {
+        return this._activeScene;
+    }
+
+    // this will only be called in response to a user action from a button that
+    // is defined by the available scenes. So we don't need to check if the scene
+    // exists.
+    setActiveScene(sceneName: string) {
+        if (this._scenes.has(sceneName)) {
+            this._activeScene = sceneName;
+        }
     }
 
 
@@ -53,6 +72,10 @@ class ScenesManager {
         newScene.camera = newCamera;
 
         this._scenes.set(sceneName, newScene);
+        // if this is the first scene make it the active scene
+        if (this._activeScene === undefined) {
+            this._activeScene = sceneName;
+        }
         return newScene;
     }
 
@@ -88,6 +111,7 @@ class ScenesManager {
         // The commands can be in any order.
 
         let resultingScene = new SceneData();
+        this._scenes.set(sceneName, resultingScene);
         resultingScene.camera = new Camera();
         resultingScene.model = new ModelGL();
 
