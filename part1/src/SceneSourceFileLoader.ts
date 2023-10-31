@@ -1,4 +1,5 @@
-import basicScene from './scenes/basic.scene';
+import basic_triangle from './scenes/basic_triangle.scene';
+import textured_triangle from './scenes/textured_triangle.scene';
 import ScenesManager from './ScenesManager';
 
 
@@ -30,6 +31,7 @@ async function loadSceneSourceFile(sceneName: string, sceneSource: string) {
 
 export function loadAndCacheSceneSourceFiles() {
     console.log('In loadAndCacheScenes');
-    loadSceneSourceFile('basic', basicScene);
+    loadSceneSourceFile('basic_triangle', basic_triangle);
+    loadSceneSourceFile('textured_triangle', textured_triangle);
 
 }
