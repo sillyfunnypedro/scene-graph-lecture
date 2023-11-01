@@ -23,6 +23,10 @@ class ModelGL {
     modelName: string = '';
     shaderName: string = '';
 
+    positionBuffer: WebGLBuffer | null = null;
+    normalBuffer: WebGLBuffer | null = null;
+    indexBuffer: WebGLBuffer | null = null;
+
 
 
     // the parameters for the model transformation

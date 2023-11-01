@@ -14,9 +14,9 @@ in vec3 viewDirectionOut;
 
 uniform sampler2D textureSampler;
 uniform sampler2D normalSampler;
-uniform vec3 lightColors[34];
-uniform vec3 lightsUniform[34];
-int lightCount = 34;
+uniform vec3 lightColors[4];
+uniform vec3 lightsUniform[4];
+int lightCount = 4;
 
 out vec4 color;
 

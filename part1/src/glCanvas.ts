@@ -16,12 +16,10 @@ let fps = 0;
 let lastTime = 0;
 let frameNumber = 0;
 
-
+let currentScene = "";
 let sceneData = new SceneData();
 const scenesManager = ScenesManager.getInstance();
 
-console.log('In glCanvas.ts', `found ${scenesManager.getScenes().length} scenes`);
-console.log('All the scenes are loaded', scenesManager.scenesLoaded());
 
 function linearLight(point1: number[], point2: number[], lights: number, color: number[]) {
     let deltaX = (point2[0] - point1[0]) / (lights - 1);
@@ -35,7 +33,7 @@ function linearLight(point1: number[], point2: number[], lights: number, color: 
 
 }
 
-linearLight([-10, .5, -5], [10, .5, -5], 30, [1.0, 1.0, 1.0]);
+//linearLight([-10, .5, -5], [10, .5, -5], 30, [1.0, 1.0, 1.0]);
 
 // lets add a red light to the scene
 sceneData.lights.addPointLight(new GLPointLight([5, 5, -5], [1.0, 1.0, 1.0]));
@@ -120,7 +118,9 @@ function compileProgram(gl: WebGLRenderingContext, model: ModelGL) {
         return null;
     }
 
-
+    if (model.shaderProgram) {
+        return;
+    }
 
     const vertexShaderName = model.getVertexShaderName();
     const fragmentShaderName = model.getFragmentShaderName();
@@ -427,21 +427,33 @@ function cleanUpTextures(gl: WebGLRenderingContext, model: ModelGL) {
             model.normalTexture = null;
         }
     }
+    // if (model.positionBuffer !== null) {
+    //     gl.deleteBuffer(model.positionBuffer);
+    //     model.positionBuffer = null;
+    // }
+
+    // if (model.indexBuffer !== null) {
+    //     gl.deleteBuffer(model.indexBuffer);
+    //     model.indexBuffer = null;
+    // }
 }
 
 function setUpVertexBuffer(gl: WebGLRenderingContext,
     model: ModelGL,
     shaderProgram: WebGLProgram) {
+    if (model.positionBuffer !== null) {
+        return;
+    }
     // create a buffer for Vertex data
-    const positionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    model.positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, model.positionBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, model.packedVertexBuffer, gl.STATIC_DRAW);
 
 
 
     // create an index buffer
-    const indexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+    model.indexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, model.indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, model.vertexIndices, gl.STATIC_DRAW);
 
     // ******************************************************
@@ -460,7 +472,7 @@ function setUpVertexBuffer(gl: WebGLRenderingContext,
     gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, model.vertexStride, 0);
 }
 
-let currentScene = "";
+
 
 function checkForUpdates(): void {
     if (!scenesManager.scenesLoaded()) {
@@ -471,11 +483,14 @@ function checkForUpdates(): void {
 
     const sceneName = scenesManager.getActiveScene();
     if (sceneName !== currentScene) {
+        cleanUpTextures(sceneData.glContext!, sceneData.model!);
         const newScene = scenesManager.getScene(sceneName);
         if (newScene === undefined) {
             throw new Error(`Scene ${sceneName} was not found`);
         }
-        sceneData.model = newScene!.models.get(sceneName)!;
+        let newModel = new ModelGL(
+            sceneData.model = newScene!.models.get(sceneName)!;
+        //currentScene = sceneName;
     }
 
 
