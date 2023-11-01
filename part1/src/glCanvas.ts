@@ -441,9 +441,7 @@ function cleanUpTextures(gl: WebGLRenderingContext, model: ModelGL) {
 function setUpVertexBuffer(gl: WebGLRenderingContext,
     model: ModelGL,
     shaderProgram: WebGLProgram) {
-    if (model.positionBuffer !== null) {
-        return;
-    }
+
     // create a buffer for Vertex data
     model.positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, model.positionBuffer);
@@ -488,9 +486,9 @@ function checkForUpdates(): void {
         if (newScene === undefined) {
             throw new Error(`Scene ${sceneName} was not found`);
         }
-        let newModel = new ModelGL(
-            sceneData.model = newScene!.models.get(sceneName)!;
-        //currentScene = sceneName;
+
+        sceneData.model = newScene!.models.get(sceneName)!;
+        currentScene = sceneName;
     }
 
 
