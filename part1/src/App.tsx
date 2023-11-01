@@ -29,6 +29,9 @@ console.log('ScenesManager', ScenesManager.getInstance().scenesLoaded());
 
 function App() {
 
+
+
+
   // the file name of the obj file to load.
   // this is passed to the ObjFileLoader and is the relative
   // path to the file from the public directory that is served
@@ -86,6 +89,8 @@ function App() {
 
     setRenderObject(newObject);
   }
+
+
 
   return (<div className="App">
     <header className="App-header">

@@ -17,7 +17,7 @@ let lastTime = 0;
 let frameNumber = 0;
 
 
-const sceneData = new SceneData();
+let sceneData = new SceneData();
 const scenesManager = ScenesManager.getInstance();
 
 console.log('In glCanvas.ts', `found ${scenesManager.getScenes().length} scenes`);
@@ -98,8 +98,11 @@ export function updateSceneData(model: ModelGL | null, camera: Camera | null): v
 
 
     sceneData.camera = camera;
-    sceneData.model = model;
-    sceneData.models.set('test-model', model!);
+    if (sceneData.model === null) {
+        sceneData.model = model;
+        sceneData.models.set('test-model', model!);
+    }
+
     if (model !== null && camera !== null) {
         renderLoop();
     }
@@ -123,7 +126,7 @@ function compileProgram(gl: WebGLRenderingContext, model: ModelGL) {
     const fragmentShaderName = model.getFragmentShaderName();
 
 
-    console.log("Compiling " + vertexShaderName + " and " + fragmentShaderName);
+
 
     // ******************************************************
     // Create the vertex shader program
@@ -457,16 +460,24 @@ function setUpVertexBuffer(gl: WebGLRenderingContext,
     gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, model.vertexStride, 0);
 }
 
+let currentScene = "";
 
 function checkForUpdates(): void {
     if (!scenesManager.scenesLoaded()) {
-        requestAnimationFrame(checkForUpdates);
         console.log('waiting for scenes to load');
+        requestAnimationFrame(checkForUpdates);
+
     }
 
     const sceneName = scenesManager.getActiveScene();
-    const scene = scenesManager.getScene(sceneName);
-    const model = scene?.model;
+    if (sceneName !== currentScene) {
+        const newScene = scenesManager.getScene(sceneName);
+        if (newScene === undefined) {
+            throw new Error(`Scene ${sceneName} was not found`);
+        }
+        sceneData.model = newScene!.models.get(sceneName)!;
+    }
+
 
     requestAnimationFrame(renderLoop);
 }

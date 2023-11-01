@@ -7,6 +7,7 @@ import ScenesManager from './ScenesManager';
 
 
 async function loadSceneSourceFile(sceneName: string, sceneSource: string) {
+
     const scenesManager = ScenesManager.getInstance();
     fetch(sceneSource)
         .then(
@@ -32,8 +33,11 @@ async function loadSceneSourceFile(sceneName: string, sceneSource: string) {
 
 export function loadAndCacheSceneSourceFiles() {
     console.log('In loadAndCacheScenes');
+
     loadSceneSourceFile('basic_triangle', basic_triangle);
     loadSceneSourceFile('textured_triangle', textured_triangle);
     loadSceneSourceFile('normal_square', normal_square)
 
 }
+
+
