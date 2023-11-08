@@ -14,8 +14,7 @@ class SceneData {
 
     // Store the primary camera
     camera: Camera | null = null;
-    model: ModelGL | null = null;
-    // a map of models indexed by string name
+
     models: Map<string, ModelGL> = new Map<string, ModelGL>();
     lights: GLLights = new GLLights();
 

@@ -68,7 +68,7 @@ class ScenesManager {
         }
 
         const newScene = new SceneData();
-        newScene.model = model;
+
 
         const newCamera = new Camera();
         newScene.camera = newCamera;
@@ -119,7 +119,6 @@ class ScenesManager {
             this.setActiveScene(sceneName);
         }
         resultingScene.camera = new Camera();
-        resultingScene.model = new ModelGL();
 
 
         let lines = sceneSource.split('\n');

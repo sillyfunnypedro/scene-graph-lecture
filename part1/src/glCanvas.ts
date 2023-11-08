@@ -18,39 +18,16 @@ let lastTime = 0;
 let frameNumber = 0;
 
 let currentScene = "";
-let sceneData = new SceneData();
+
 const scenesManager = ScenesManager.getInstance();
 
 let gl: WebGLRenderingContext | null = null;
 
 
-function linearLight(point1: number[], point2: number[], lights: number, color: number[]) {
-    let deltaX = (point2[0] - point1[0]) / (lights - 1);
-    let deltaY = (point2[1] - point1[1]) / (lights - 1);
-    let deltaZ = (point2[2] - point1[2]) / (lights - 1);
-
-    for (let i = 0; i <= lights; i++) {
-        let light = new GLPointLight([point1[0] + i * deltaX, point1[1] + i * deltaY, point1[2] + i * deltaZ], color);
-        sceneData.lights.addPointLight(light);
-    }
-
-}
-
-//linearLight([-10, .5, -5], [10, .5, -5], 30, [1.0, 1.0, 1.0]);
-
-// lets add a red light to the scene
-sceneData.lights.addPointLight(new GLPointLight([5, 5, -5], [1.0, 1.0, 1.0]));
-// lets add a white light to the scene
-sceneData.lights.addPointLight(new GLPointLight([-5, 5, -5], [1.0, 1.0, 1.0]));
-sceneData.lights.addPointLight(new GLPointLight([-5, 5, 5], [1.0, 1.0, 1.0]));
-sceneData.lights.addPointLight(new GLPointLight([5, 5, 5], [1.0, 1.0, 1.0]));
 
 // Set up the canvas and WebGL context so that our rendering loop can draw on it
 // We store the gl context in the sceneData object so that we can access it later
 export const setupCanvas = function () {
-    if (!sceneData) {
-        return;
-    }
 
     if (gl !== null) {
         return;
@@ -79,20 +56,7 @@ export const setupCanvas = function () {
 // for now the scene is contained here in glCanvas when a scene is pulled out
 // then this needs to go outside of this file.
 export function updateSceneData(model: ModelGL | null, camera: Camera | null): void {
-    if (!sceneData) {
-        return;
-    }
 
-    // We know we need to clean up the textures when we switch models
-
-    cleanUpTextures(gl!, sceneData.model!);
-
-
-    sceneData.camera = camera;
-    if (sceneData.model === null) {
-        sceneData.model = model;
-        sceneData.models.set('test-model', model!);
-    }
 
     if (model !== null && camera !== null) {
         renderLoop();
@@ -101,7 +65,7 @@ export function updateSceneData(model: ModelGL | null, camera: Camera | null): v
 
 function compileProgram(gl: WebGLRenderingContext, model: ModelGL) {
 
-
+    let sceneData = scenesManager.getScene(scenesManager.getActiveScene())!;
 
     if (!sceneData.camera) {
         return null;
@@ -215,17 +179,20 @@ function compileProgram(gl: WebGLRenderingContext, model: ModelGL) {
  * @param gl
  * uses sceneData.lights
  */
-function setUpLights(gl: WebGLRenderingContext, shaderProgram: WebGLProgram) {
+function setUpLights(gl: WebGLRenderingContext, model: ModelGL) {
     if (!gl) {
         return;
     }
+    let shaderProgram = model.shaderProgram!;
+
+    let sceneData = scenesManager.getScene(scenesManager.getActiveScene())!;
 
     if (!sceneData.lights) {
         return;
     }
 
     // we only do this for a program that has a VerteTextureNormalNormalMapShader
-    if (sceneData.model!.getVertexShaderName() !== 'vertexTextureNormalNormalMapShader') {
+    if (model.getVertexShaderName() !== 'vertexTextureNormalNormalMapShader') {
         return;
     }
 
@@ -495,14 +462,19 @@ function checkForUpdates(): void {
     }
 
     const sceneName = scenesManager.getActiveScene();
+
     if (sceneName !== currentScene) {
-        cleanUpTextures(gl!, sceneData.model!);
+
+        // for (let model of sceneData!.models.values()) {
+        //     cleanUpTextures(gl!, model);
+        // }
+
         const newScene = scenesManager.getScene(sceneName);
         if (newScene === undefined) {
             throw new Error(`Scene ${sceneName} was not found`);
         }
 
-        sceneData.model = newScene!.models.get(sceneName)!;
+
         currentScene = sceneName;
     }
 
@@ -521,18 +493,18 @@ function requestUpdate(): void {
 
 function renderLoop(): void {
     const sceneName = scenesManager.getActiveScene();
-    const scene = scenesManager.getScene(sceneName);
-    if (scene === undefined) {
+    const sceneData = scenesManager.getScene(sceneName);
+    if (sceneData === undefined) {
         throw new Error(`Scene ${sceneName} was not found`);
     }
 
-    if (!scene.sceneLoaded()) {
+    if (!sceneData.sceneLoaded()) {
         requestAnimationFrame(checkForUpdates);
         return;
     }
 
 
-    sceneData = scene;
+
     //iterate over the models
     for (let model of sceneData.models.values()) {
         // if the model has not been loaded then load it
@@ -549,8 +521,8 @@ function renderScene(sceneName: string): void {
 function renderModel(model: ModelGL): void {
 
     // we might get called early. lets bail out if the information is incomplete.
-
-    if (sceneData === null) {
+    let sceneData = scenesManager.getScene(scenesManager.getActiveScene());
+    if (sceneData === null || sceneData === undefined) {
         return;
     }
 
@@ -585,7 +557,7 @@ function renderModel(model: ModelGL): void {
 
     setUpVertexBuffer(gl, model, model.shaderProgram!);
 
-    setUpLights(gl, model.shaderProgram!);
+    setUpLights(gl, model);
 
 
     // SetUpTextures will set up any textures required by the model.
