@@ -89,7 +89,6 @@ void main() {
 
     normalVector = normalize(normalVector * 2.0 - 1.0);
     normalVector = normalize(TBN * normalVector);
-    textureColor = vec4(1.0, 1.0, 1.0, 1.0);
 
     // calculate the lighting for all the lights
     color = vec4(lightsUniform[0], 1);
@@ -106,7 +105,7 @@ void main() {
         100.0,
         0.8,
         0.2,
-        2.0);
+        1.5);
         
     }
     color = color / float(lightCount);

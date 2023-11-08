@@ -1,6 +1,7 @@
 import basic_triangle from './scenes/basic_triangle.scene';
 import textured_triangle from './scenes/textured_triangle.scene';
 import normal_square from './scenes/normal_square.scene';
+import house_windmill from './scenes/house_windmill.scene';
 import ScenesManager from './ScenesManager';
 
 
@@ -9,6 +10,7 @@ import ScenesManager from './ScenesManager';
 async function loadSceneSourceFile(sceneName: string, sceneSource: string) {
 
     const scenesManager = ScenesManager.getInstance();
+    scenesManager.sceneNames.push(sceneName);
 
     fetch(sceneSource)
         .then(
@@ -38,6 +40,7 @@ export function loadAndCacheSceneSourceFiles() {
     loadSceneSourceFile('basic_triangle', basic_triangle);
     loadSceneSourceFile('textured_triangle', textured_triangle);
     loadSceneSourceFile('normal_square', normal_square)
+    loadSceneSourceFile('house_windmill', house_windmill)
 
 }
 

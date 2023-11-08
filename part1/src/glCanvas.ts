@@ -204,7 +204,7 @@ function setUpLights(gl: WebGLRenderingContext, model: ModelGL) {
     // get the light position attribute location
     const lightPositionsLocation = gl.getUniformLocation(shaderProgram, 'lightsUniform');
     if (lightPositionsLocation === null) {
-        throw new Error('Failed to get the storage location of hack');
+        throw new Error('Failed to get the storage location of lightsUniform');
     }
     let lightPositions = sceneData.lights.getPositionsFloat32();
     gl.uniform3fv(lightPositionsLocation, lightPositions);

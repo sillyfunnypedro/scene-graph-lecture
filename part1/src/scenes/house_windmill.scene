@@ -1,0 +1,13 @@
+object house house
+
+translate house -1.5 0 0
+object windmill windmill
+translate windmill 1.5 0 0
+
+light point 0 2 0 1 1 1
+light point 1 2 1 1 1 1
+light point 2 2 2 1 1 1
+
+
+
+camera 5 5 2 0 0 0 0 1 0

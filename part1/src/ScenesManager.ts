@@ -18,6 +18,7 @@ class ScenesManager {
     private _activeScene: string = "";
 
     private static _instance: ScenesManager;
+    sceneNames: string[] = [];
 
     private constructor() {
         // do nothing
@@ -40,7 +41,7 @@ class ScenesManager {
 
     // functions for the UI.  These functions are called by the UI
     getScenes(): string[] {
-        return Array.from(this._scenes.keys());
+        return this.sceneNames;
     }
 
 
