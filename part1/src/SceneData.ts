@@ -11,9 +11,6 @@ import { GLPointLight, GLLights } from "./GLLights";
 
 
 class SceneData {
-    // Store the WebGL rendering context
-    glContext: WebGLRenderingContext | null = null;
-
 
     // Store the primary camera
     camera: Camera | null = null;
@@ -22,13 +19,13 @@ class SceneData {
     models: Map<string, ModelGL> = new Map<string, ModelGL>();
     lights: GLLights = new GLLights();
 
+    transformations: Map<string, string[]> = new Map<string, string[]>();
+
 
     source: string = '__loading__';
     name: string = '';
 
-    // store the canvas width and height.
-    width: number = 0;
-    height: number = 0;
+
 
 
 

@@ -9,6 +9,7 @@ import shaderSourceCodeMap from './ShaderManager';
 import SceneData from './SceneData';
 import ScenesManager from './ScenesManager';
 import { GLPointLight, GLLights } from './GLLights';
+import { request } from 'http';
 
 
 // measure the FPS
@@ -19,6 +20,8 @@ let frameNumber = 0;
 let currentScene = "";
 let sceneData = new SceneData();
 const scenesManager = ScenesManager.getInstance();
+
+let gl: WebGLRenderingContext | null = null;
 
 
 function linearLight(point1: number[], point2: number[], lights: number, color: number[]) {
@@ -49,8 +52,7 @@ export const setupCanvas = function () {
         return;
     }
 
-    // React is calling this twice, we only want one glContext.
-    if (sceneData.glContext !== null) {
+    if (gl !== null) {
         return;
     }
 
@@ -61,20 +63,11 @@ export const setupCanvas = function () {
     }
 
     // Get the WebGL context NOte we need WebGL2 for this application
-    var gl = canvas.getContext('webgl2') || canvas.getContext('experimental-webgl') as WebGLRenderingContext;
+    gl = canvas.getContext('webgl2') || canvas.getContext('experimental-webgl') as WebGLRenderingContext;
     if (!gl) {
         alert('WebGL not supported');
         return;
     }
-
-    sceneData.width = canvas.width;
-    sceneData.height = canvas.height;
-
-    // Store the WebGLRenderingContext on the sceneData object
-    sceneData.glContext = gl;
-
-    // Set up the viewport
-
 
     // Set the clear color to be purple
     gl.clearColor(1.0, 0.0, 1.0, 1.0);
@@ -92,7 +85,7 @@ export function updateSceneData(model: ModelGL | null, camera: Camera | null): v
 
     // We know we need to clean up the textures when we switch models
 
-    cleanUpTextures(sceneData.glContext!, sceneData.model!);
+    cleanUpTextures(gl!, sceneData.model!);
 
 
     sceneData.camera = camera;
@@ -472,16 +465,38 @@ function setUpVertexBuffer(gl: WebGLRenderingContext,
 
 
 
+
+
+function setUpNormalBuffer(gl: WebGLRenderingContext, model: ModelGL, shaderProgram: WebGLProgram) {
+
+    const vertexShaderName = model.getVertexShaderName();
+    // check to see if Normal is in the shader name
+    if (vertexShaderName.includes('Normal')) {
+        // get the normal attribute location
+        const normalLocation = gl.getAttribLocation(model.shaderProgram!, 'normal');
+
+        // enable the normal attribute
+
+        gl.enableVertexAttribArray(normalLocation);
+
+        // tell the normal attribute how to get data out of the normal buffer
+        gl.vertexAttribPointer(normalLocation, 3, gl.FLOAT, false, model.vertexStride, model.normalOffset);
+    }
+}
+
+
+
 function checkForUpdates(): void {
+    updateRequested = false;
     if (!scenesManager.scenesLoaded()) {
         console.log('waiting for scenes to load');
-        requestAnimationFrame(checkForUpdates);
+        requestUpdate();
 
     }
 
     const sceneName = scenesManager.getActiveScene();
     if (sceneName !== currentScene) {
-        cleanUpTextures(sceneData.glContext!, sceneData.model!);
+        cleanUpTextures(gl!, sceneData.model!);
         const newScene = scenesManager.getScene(sceneName);
         if (newScene === undefined) {
             throw new Error(`Scene ${sceneName} was not found`);
@@ -492,10 +507,46 @@ function checkForUpdates(): void {
     }
 
 
-    requestAnimationFrame(renderLoop);
+    renderLoop();
+}
+
+let updateRequested = false;
+
+function requestUpdate(): void {
+    if (!updateRequested) {
+        updateRequested = true;
+        requestAnimationFrame(checkForUpdates);
+    }
 }
 
 function renderLoop(): void {
+    const sceneName = scenesManager.getActiveScene();
+    const scene = scenesManager.getScene(sceneName);
+    if (scene === undefined) {
+        throw new Error(`Scene ${sceneName} was not found`);
+    }
+
+    if (!scene.sceneLoaded()) {
+        requestAnimationFrame(checkForUpdates);
+        return;
+    }
+
+
+    sceneData = scene;
+    //iterate over the models
+    for (let model of sceneData.models.values()) {
+        // if the model has not been loaded then load it
+        renderModel(model);
+    }
+
+
+    requestUpdate();
+}
+
+function renderScene(sceneName: string): void {
+
+}
+function renderModel(model: ModelGL): void {
 
     // we might get called early. lets bail out if the information is incomplete.
 
@@ -503,16 +554,12 @@ function renderLoop(): void {
         return;
     }
 
-    let gl = sceneData.glContext;
 
+    // sanity check just in case there is no gl context
     if (!gl) {
         return;
     }
 
-    let model = sceneData.model;
-    if (!model) {
-        return;
-    }
 
     let camera = sceneData.camera;
     if (!camera) {
@@ -545,23 +592,10 @@ function renderLoop(): void {
     setUpTextures(gl, model, model.shaderProgram!)
 
 
-    const vertexShaderName = model.getVertexShaderName();
-    // check to see if Normal is in the shader name
-    if (vertexShaderName.includes('Normal')) {
-        // get the normal attribute location
-        const normalLocation = gl.getAttribLocation(model.shaderProgram!, 'normal');
+    setUpNormalBuffer(gl, model, model.shaderProgram!);
 
-        // enable the normal attribute
-
-        gl.enableVertexAttribArray(normalLocation);
-
-        // tell the normal attribute how to get data out of the normal buffer
-        gl.vertexAttribPointer(normalLocation, 3, gl.FLOAT, false, model.vertexStride, model.normalOffset);
-    }
-
-
-    camera.setViewPortWidth(sceneData.width);
-    camera.setViewPortHeight(sceneData.height);
+    camera.setViewPortWidth(gl.canvas.width);
+    camera.setViewPortHeight(gl.canvas.height);
 
 
 
@@ -656,5 +690,5 @@ function renderLoop(): void {
         lastTime = now;
     }
 
-    requestAnimationFrame(checkForUpdates);
+    //requestAnimationFrame(checkForUpdates);
 }

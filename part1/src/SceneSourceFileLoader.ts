@@ -9,6 +9,7 @@ import ScenesManager from './ScenesManager';
 async function loadSceneSourceFile(sceneName: string, sceneSource: string) {
 
     const scenesManager = ScenesManager.getInstance();
+
     fetch(sceneSource)
         .then(
             response =>

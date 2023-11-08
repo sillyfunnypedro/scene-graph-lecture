@@ -1,2 +1,8 @@
 object normal_square normal_square
 camera 0 5 5 0 0 0 0 1 0
+light point -5 5 -5 1 1 1
+light point -5 5 5 1 1 1
+light point 5 5 -5 1 1 1
+light point 5 5 5 1 1 1
+
+rotate normal_square y 45

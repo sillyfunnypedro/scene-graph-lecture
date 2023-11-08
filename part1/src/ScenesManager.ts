@@ -4,6 +4,7 @@ import ModelGL from "./ModelGL";
 import Camera from "./Camera";
 import { GLPointLight, GLDirectionalLight, GLSpotLight, GLLights } from "./GLLights";
 import { vec3 } from "gl-matrix";
+import { join } from "path";
 
 
 
@@ -145,6 +146,15 @@ class ScenesManager {
                 case 'object':
                     this.processObjectCommand(resultingScene, parameters);
                     break;
+                case 'rotate':
+                    this.processTransformationCommand(resultingScene, parameters);
+                    break;
+                case 'translate':
+                    this.processTransformationCommand(resultingScene, parameters);
+                    break;
+                case 'scale':
+                    this.processTransformationCommand(resultingScene, parameters);
+                    break;
                 default:
                     console.log(`unknown command ${command}`);
                     throw new Error(`unknown command ${command}`);
@@ -176,6 +186,52 @@ class ScenesManager {
             parseFloat(parameters[7]),
             parseFloat(parameters[8])
         ));
+    }
+
+    processTransformationCommand(scene: SceneData, parameters: string[]) {
+        let model_name = parameters[0];
+        // make a string of the remaining parameters
+
+        let transformation: string = parameters.slice(1).join(' ');
+
+        let currentTransformations = scene.transformations.get(model_name);
+        if (currentTransformations === undefined) {
+            currentTransformations = [];
+        }
+        currentTransformations.push(transformation);
+        scene.transformations.set(model_name, currentTransformations);
+        console.log(`adding transformation ${transformation} to ${model_name}`);
+    }
+
+
+
+    processRotateCommand(scene: SceneData, parameters: string[]) {
+        // we need to wait until the models are loaded before we can rotate them.
+
+        // // rotate model [x|y|z] angle
+        // let model_name = parameters[0];
+        // let model = scene.transformations.get(model_name);
+        // if (model === undefined) {
+        //     console.log(`could not find model ${model_name}`);
+        //     throw new Error(`could not find model ${model_name}`);
+        // }
+
+        // let axis = parameters[1].toLowerCase();
+        // let angle = parseFloat(parameters[2]);
+        // switch (axis) {
+        //     case 'x':
+        //         model.rotateX += angle;
+        //         break;
+        //     case 'y':
+        //         model.rotateY += angle;
+        //         break;
+        //     case 'z':
+        //         model.rotateZ += angle;
+        //         break;
+        //     default:
+        //         console.log(`unknown axis ${axis}`);
+        //         throw new Error(`unknown axis ${axis}`);
+        // }
     }
 
     processLightCommand(scene: SceneData, parameters: string[]) {
