@@ -57,9 +57,14 @@ export const setupCanvas = function () {
 // then this needs to go outside of this file.
 export function updateSceneData(model: ModelGL | null, camera: Camera | null): void {
 
-
+    let currentScene = scenesManager.getScene(scenesManager.getActiveScene());
+    if (currentScene === undefined) {
+        console.log("wait for the scenes before we do any camera work")
+        return;
+    }
+    currentScene.camera = camera;
     if (model !== null && camera !== null) {
-        renderLoop();
+        requestUpdate();
     }
 }
 
@@ -509,15 +514,16 @@ function renderLoop(): void {
     for (let model of sceneData.models.values()) {
         // if the model has not been loaded then load it
         renderModel(model);
+        cleanUpTextures(gl!, model);
     }
+
+
 
 
     requestUpdate();
 }
 
-function renderScene(sceneName: string): void {
 
-}
 function renderModel(model: ModelGL): void {
 
     // we might get called early. lets bail out if the information is incomplete.

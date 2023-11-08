@@ -81,16 +81,7 @@ class ScenesManager {
         return newScene;
     }
 
-    async makeBasicTriangleScene() {
-        const sceneName = "tri-plain";
-        let newScene = await this.addScene(sceneName);
 
-        if (newScene === undefined) {
-            return;
-        }
-        newScene.camera?.setEyePosition(vec3.fromValues(0, 0, 5));
-
-    }
 
     parseSceneFile(sceneName: string, sceneSource: string) {
         // parse the scene file and add the scene to the list of scenes.
@@ -146,13 +137,13 @@ class ScenesManager {
                     this.processObjectCommand(resultingScene, parameters);
                     break;
                 case 'rotate':
-                    this.processTransformationCommand(resultingScene, parameters);
+                    this.processTransformationCommand(resultingScene, tokens);
                     break;
                 case 'translate':
-                    this.processTransformationCommand(resultingScene, parameters);
+                    this.processTransformationCommand(resultingScene, tokens);
                     break;
                 case 'scale':
-                    this.processTransformationCommand(resultingScene, parameters);
+                    this.processTransformationCommand(resultingScene, tokens);
                     break;
                 default:
                     console.log(`unknown command ${command}`);
@@ -188,10 +179,10 @@ class ScenesManager {
     }
 
     processTransformationCommand(scene: SceneData, parameters: string[]) {
-        let model_name = parameters[0];
+        let model_name = parameters[1];
         // make a string of the remaining parameters
 
-        let transformation: string = parameters.slice(1).join(' ');
+        let transformation: string = parameters.join(' ');
 
         let currentTransformations = scene.transformations.get(model_name);
         if (currentTransformations === undefined) {
@@ -202,35 +193,77 @@ class ScenesManager {
         console.log(`adding transformation ${transformation} to ${model_name}`);
     }
 
+    processTransformations(scene: SceneData, model: ModelGL, modelName: string) {
+        let modelTranformations = scene.transformations.get(modelName);
+
+        if (modelTranformations === undefined) {
+            return;
+        }
+        for (let transformation of modelTranformations) {
+            let tokens = transformation.split(' ');
+            let command = tokens[0].toLowerCase();
+
+            // do a sanity check to make sure the model name matches
+            let foundModelName = tokens[1];
+            if (foundModelName !== modelName) {
+                throw new Error(`model name ${foundModelName} does not match ${modelName}`);
+            }
+
+            let parameters = [tokens[0]].concat(tokens.slice(2));
+            switch (command) {
+                case 'rotate':
+                    this.processRotateCommand(model, parameters);
+                    break;
+                case 'translate':
+                    this.processTranslateCommand(model, parameters);
+                    break;
+                case 'scale':
+                    this.processScaleCommand(model, parameters);
+                    break;
+                default:
+                    console.log(`unknown transformation ${command}`);
+                    throw new Error(`unknown transformation ${command}`);
+            }
+        }
+
+    }
 
 
-    processRotateCommand(scene: SceneData, parameters: string[]) {
-        // we need to wait until the models are loaded before we can rotate them.
+    processRotateCommand(model: ModelGL, parameters: string[]) {
+        let axis = parameters[1].toLowerCase();
+        let angle = parseFloat(parameters[2]);
+        switch (axis) {
+            case 'x':
+                model.rotateX += angle;
+                break;
+            case 'y':
+                model.rotateY += angle;
+                break;
+            case 'z':
+                model.rotateZ += angle;
+                break;
+            default:
+                console.log(`unknown axis ${axis}`);
+                throw new Error(`unknown axis ${axis}`);
+        }
+    }
 
-        // // rotate model [x|y|z] angle
-        // let model_name = parameters[0];
-        // let model = scene.transformations.get(model_name);
-        // if (model === undefined) {
-        //     console.log(`could not find model ${model_name}`);
-        //     throw new Error(`could not find model ${model_name}`);
-        // }
+    processTranslateCommand(model: ModelGL, parameters: string[]) {
+        let xDelta = parseFloat(parameters[1]);
+        let yDelta = parseFloat(parameters[2]);
+        let zDelta = parseFloat(parameters[3]);
+        model.translateX += xDelta;
+        model.translateY += yDelta;
+        model.translateZ += zDelta;
+    }
 
-        // let axis = parameters[1].toLowerCase();
-        // let angle = parseFloat(parameters[2]);
-        // switch (axis) {
-        //     case 'x':
-        //         model.rotateX += angle;
-        //         break;
-        //     case 'y':
-        //         model.rotateY += angle;
-        //         break;
-        //     case 'z':
-        //         model.rotateZ += angle;
-        //         break;
-        //     default:
-        //         console.log(`unknown axis ${axis}`);
-        //         throw new Error(`unknown axis ${axis}`);
-        // }
+    processScaleCommand(model: ModelGL, parameters: string[]) {
+        let xScale = parseFloat(parameters[1]);
+        let yScale = parseFloat(parameters[2]);
+        let zScale = parseFloat(parameters[3]);
+        model.scaleX *= xScale;
+        model.scaleY *= yScale;
+        model.scaleZ *= zScale;
     }
 
     processLightCommand(scene: SceneData, parameters: string[]) {
@@ -305,6 +338,7 @@ class ScenesManager {
         let newModel = await objFileLoader.getModel(objectFile);
         if (newModel !== undefined) {
             scene.models.set(objectName, newModel);
+            this.processTransformations(scene, newModel, objectName);
         }
         scene.modelsLoaded += 1;
     }

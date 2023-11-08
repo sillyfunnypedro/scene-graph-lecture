@@ -6,3 +6,8 @@ light point 5 5 -5 1 1 1
 light point 5 5 5 1 1 1
 
 rotate normal_square y 45
+translate normal_square 0 -4 0
+scale normal_square 2 2 2
+
+object tri_tex tri-tex
+scale tri_tex 10 10 10
