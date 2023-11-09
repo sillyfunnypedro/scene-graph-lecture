@@ -45,6 +45,8 @@ export const setupCanvas = function () {
         alert('WebGL not supported');
         return;
     }
+    // console.log the version of WebGL we are using
+    console.log(gl!.getParameter(gl!.VERSION));
 
     // Set the clear color to be purple
     gl.clearColor(1.0, 0.0, 1.0, 1.0);
@@ -509,6 +511,12 @@ function renderLoop(): void {
     }
 
 
+    // Clear the canvas to a purple color
+    // currently in this code if you leave the clear in there
+    // no image is seen.
+    let color = (sceneData.frameNumber++ % 255) / 255.0;
+    gl!.clearColor(color, .2, .6, 0.1);
+    //gl!.clear(gl!.COLOR_BUFFER_BIT);
 
     //iterate over the models
     for (let model of sceneData.models.values()) {
@@ -516,6 +524,9 @@ function renderLoop(): void {
         renderModel(model);
         cleanUpTextures(gl!, model);
     }
+
+    // gl!.flush();
+    // gl!.finish();
 
 
 
@@ -610,12 +621,6 @@ function renderModel(model: ModelGL): void {
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
 
-    // Clear the canvas to a purple color
-    // currently in this code if you leave the clear in there
-    // no image is seen.
-    let color = (sceneData.frameNumber++ % 255) / 255.0;
-    gl.clearColor(color, .2, .6, 0.1);
-    //gl.clear(gl.COLOR_BUFFER_BIT);
 
 
 
@@ -651,8 +656,6 @@ function renderModel(model: ModelGL): void {
     }
 
 
-    gl.flush();
-    gl.finish();
 
 
     // ******************************************************
