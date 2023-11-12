@@ -40,7 +40,7 @@ export function loadAndCacheSceneSourceFiles() {
 
     //loadSceneSourceFile('basic_triangle', basic_triangle);
     //loadSceneSourceFile('textured_triangle', textured_triangle);
-    loadSceneSourceFile('normal_square', normal_square)
+    //loadSceneSourceFile('normal_square', normal_square)
     //loadSceneSourceFile('house_windmill', house_windmill)
     loadSceneSourceFile('graph', graph)
 

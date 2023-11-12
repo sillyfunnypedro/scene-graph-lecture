@@ -10,6 +10,7 @@ import SceneData from './SceneData';
 import ScenesManager from './ScenesManager';
 import { GLPointLight, GLLights } from './GLLights';
 import { request } from 'http';
+import { mat4 } from 'gl-matrix';
 
 
 // measure the FPS
@@ -521,32 +522,40 @@ function renderLoop(): void {
     //iterate over the models
     for (let model of sceneData.models.values()) {
         // if the model has not been loaded then load it
-        renderModel(model);
-        renderHierarchy(model);
-        cleanUpTextures(gl!, model);
+        // right now models in a hierarchy still feature in teh models array 
+        // this stops child models from being displayed twice
+        if (model.parent === null) {
+            let parentMatrix = mat4.create();
+            renderHierarchy(model, parentMatrix);
+        }
+
     }
-
-    // gl!.flush();
-    // gl!.finish();
-
-
-
-
     requestUpdate();
 }
 
-function renderHierarchy(model: ModelGL): void {
-    if (model.children.length === 0) {
-        return;
-    }
+// the parent has been rendered (it is the model)
+function renderHierarchy(model: ModelGL, parentMatrix: mat4): void {
+
+    let modelMatrix = model.getModelMatrix();
+    let localMatrix = mat4.create();
+    // prepare the model matrix for this object
+    mat4.multiply(localMatrix, parentMatrix, modelMatrix);
+    model.setHierarichalMatrix(localMatrix);
+
+    renderModel(model);
+
+    model.setHierarichalMatrix(null);
+    cleanUpTextures(gl!, model);
+
+
+    // now render all children and we are done
     for (let child of model.children) {
-        renderModel(child);
-        renderHierarchy(child);
+        renderHierarchy(child, localMatrix);
     }
 }
 
 
-function renderModel(model: ModelGL): void {
+function renderModel(model: ModelGL, parentMatrix: mat4 | null = null): void {
 
     // we might get called early. lets bail out if the information is incomplete.
     let sceneData = scenesManager.getScene(scenesManager.getActiveScene());

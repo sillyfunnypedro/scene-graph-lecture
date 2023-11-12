@@ -23,10 +23,12 @@ class ModelGL {
     modelName: string = '';
     shaderName: string = '';
     children: Array<ModelGL> = [];
+    parent: ModelGL | null = null;
 
     positionBuffer: WebGLBuffer | null = null;
     normalBuffer: WebGLBuffer | null = null;
     indexBuffer: WebGLBuffer | null = null;
+    hierarchicalMatrix: mat4 | null = null;
 
 
 
@@ -115,10 +117,20 @@ class ModelGL {
         return shaderName;
     }
 
+    addChild(model: ModelGL): void {
+        this.children.push(model);
+    }
+
+
+
 
     // each model has its own transforms now, we will provide a computed
     // model matrix to the renderer
     getModelMatrix(): mat4 {
+        if (this.hierarchicalMatrix !== null) {
+            return this.hierarchicalMatrix;
+        }
+
         let modelMatrix: mat4 = mat4.create();
         mat4.translate(modelMatrix, modelMatrix, [this.translateX, this.translateY, this.translateZ]);
         mat4.rotateX(modelMatrix, modelMatrix, this.rotateX / 180 * Math.PI);
@@ -126,6 +138,10 @@ class ModelGL {
         mat4.rotateZ(modelMatrix, modelMatrix, this.rotateZ / 180 * Math.PI);
         mat4.scale(modelMatrix, modelMatrix, [this.scaleX, this.scaleY, this.scaleZ]);
         return modelMatrix;
+    }
+
+    setHierarichalMatrix(mat: mat4 | null): void {
+        this.hierarchicalMatrix = mat;
     }
 
 }

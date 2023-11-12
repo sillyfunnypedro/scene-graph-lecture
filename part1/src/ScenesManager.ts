@@ -163,7 +163,7 @@ class ScenesManager {
         while (!scene.sceneLoaded()) {
             // sleep for 100 ms
             console.log('waiting for load')
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 100));
 
         }
         this.processPostLoadCommands(scene);
@@ -324,7 +324,8 @@ class ScenesManager {
         }
 
         console.log(`adding child ${childName} to ${model}`)
-
+        model.addChild(childModel);
+        childModel.parent = model;
         // model.addChild(childName);
     }
 
