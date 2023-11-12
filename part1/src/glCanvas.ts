@@ -522,6 +522,7 @@ function renderLoop(): void {
     for (let model of sceneData.models.values()) {
         // if the model has not been loaded then load it
         renderModel(model);
+        renderHierarchy(model);
         cleanUpTextures(gl!, model);
     }
 
@@ -532,6 +533,16 @@ function renderLoop(): void {
 
 
     requestUpdate();
+}
+
+function renderHierarchy(model: ModelGL): void {
+    if (model.children.length === 0) {
+        return;
+    }
+    for (let child of model.children) {
+        renderModel(child);
+        renderHierarchy(child);
+    }
 }
 
 

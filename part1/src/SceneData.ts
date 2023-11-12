@@ -18,7 +18,7 @@ class SceneData {
     models: Map<string, ModelGL> = new Map<string, ModelGL>();
     lights: GLLights = new GLLights();
 
-    transformations: Map<string, string[]> = new Map<string, string[]>();
+    postLoadCommands: Map<string, string[]> = new Map<string, string[]>();
 
 
     source: string = '__loading__';

@@ -4,7 +4,7 @@
 export const GitHubPrefix = 'https://raw.githubusercontent.com/sillyfunnypedro/5310-Fall-2023-Resources/main/objects/';
 
 export const LocalServerPrefix = 'http://localhost:8080/objects/';
-let usingLocalServer = false;
+let usingLocalServer = true;
 
 export function SelectLocalServer(local: boolean) {
     usingLocalServer = local;

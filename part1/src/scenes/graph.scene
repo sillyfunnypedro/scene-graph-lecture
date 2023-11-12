@@ -1,0 +1,12 @@
+
+
+object cube cube-tex
+
+object cube2 cube-tex
+scale cube2 0.5 0.5 0.5
+translate cube2 0 2 0
+rotate cube2 y 45
+
+scale cube 1 1 1
+
+child cube cube2

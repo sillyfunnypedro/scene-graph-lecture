@@ -138,13 +138,17 @@ class ScenesManager {
                     this.processObjectCommand(resultingScene, parameters);
                     break;
                 case 'rotate':
-                    this.processTransformationCommand(resultingScene, tokens);
+                    this.addPostTransformationCommand(resultingScene, tokens);
                     break;
                 case 'translate':
-                    this.processTransformationCommand(resultingScene, tokens);
+                    this.addPostTransformationCommand(resultingScene, tokens);
                     break;
                 case 'scale':
-                    this.processTransformationCommand(resultingScene, tokens);
+                    this.addPostTransformationCommand(resultingScene, tokens);
+                    break;
+
+                case 'child':
+                    this.addPostChildCommand(resultingScene, tokens);
                     break;
                 default:
                     console.log(`unknown command ${command}`);
@@ -152,6 +156,17 @@ class ScenesManager {
 
             }
         }
+        this.waitForLoadAndProcessPostCommands(resultingScene);
+    }
+
+    async waitForLoadAndProcessPostCommands(scene: SceneData) {
+        while (!scene.sceneLoaded()) {
+            // sleep for 100 ms
+            console.log('waiting for load')
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+        }
+        this.processPostLoadCommands(scene);
     }
 
     processCameraCommand(scene: SceneData, parameters: string[]) {
@@ -179,29 +194,57 @@ class ScenesManager {
         ));
     }
 
-    processTransformationCommand(scene: SceneData, parameters: string[]) {
+    addPostLoadCommand(scene: SceneData, model_name: string, command: string) {
+        let postLoadCommands = scene.postLoadCommands.get(model_name);
+        if (postLoadCommands === undefined) {
+            postLoadCommands = [];
+        }
+        postLoadCommands.push(command);
+        scene.postLoadCommands.set(model_name, postLoadCommands);
+        console.log(`adding postLoad ${command} to ${model_name}`);
+    }
+
+    addPostTransformationCommand(scene: SceneData, parameters: string[]) {
         let model_name = parameters[1];
         // make a string of the remaining parameters
 
         let transformation: string = parameters.join(' ');
 
-        let currentTransformations = scene.transformations.get(model_name);
-        if (currentTransformations === undefined) {
-            currentTransformations = [];
-        }
-        currentTransformations.push(transformation);
-        scene.transformations.set(model_name, currentTransformations);
+        this.addPostLoadCommand(scene, model_name, transformation);
         console.log(`adding transformation ${transformation} to ${model_name}`);
     }
 
-    processTransformations(scene: SceneData, model: ModelGL, modelName: string) {
-        let modelTranformations = scene.transformations.get(modelName);
+    addPostChildCommand(scene: SceneData, parameters: string[]) {
+        let model_name = parameters[1];
+        let child_name = parameters[2];
 
-        if (modelTranformations === undefined) {
+        let command_string = parameters.join(' ');
+        this.addPostLoadCommand(scene, model_name, command_string);
+    }
+
+
+
+    processPostLoadCommands(scene: SceneData) {
+        let models = scene.models.keys();
+        for (let modelName of models) {
+            this.processPostLoadCommandsForModel(scene, modelName);
+        }
+
+    }
+    processPostLoadCommandsForModel(scene: SceneData, modelName: string) {
+        let postLoadCommands = scene.postLoadCommands.get(modelName);
+        let model = scene.models.get(modelName);
+
+        if (model === undefined) {
+            console.log(`model ${modelName} not found`);
+            throw new Error(`model ${modelName} not found`);
+        }
+
+        if (postLoadCommands === undefined) {
             return;
         }
-        for (let transformation of modelTranformations) {
-            let tokens = transformation.split(' ');
+        for (let postLoadCommand of postLoadCommands) {
+            let tokens = postLoadCommand.split(' ');
             let command = tokens[0].toLowerCase();
 
             // do a sanity check to make sure the model name matches
@@ -220,6 +263,9 @@ class ScenesManager {
                     break;
                 case 'scale':
                     this.processScaleCommand(model, parameters);
+                    break;
+                case 'child':
+                    this.processChildCommand(scene, model, parameters);
                     break;
                 default:
                     console.log(`unknown transformation ${command}`);
@@ -245,6 +291,7 @@ class ScenesManager {
                 break;
             default:
                 console.log(`unknown axis ${axis}`);
+                console.log(`${parameters}`)
                 throw new Error(`unknown axis ${axis}`);
         }
     }
@@ -265,6 +312,20 @@ class ScenesManager {
         model.scaleX *= xScale;
         model.scaleY *= yScale;
         model.scaleZ *= zScale;
+    }
+
+    processChildCommand(scene: SceneData, model: ModelGL, parameters: string[]) {
+        let childName = parameters[1];
+        let childModel = scene.models.get(childName);
+
+        if (childModel === undefined) {
+            console.log(`child ${childName} not found`);
+            throw new Error(`child ${childName} not found`);
+        }
+
+        console.log(`adding child ${childName} to ${model}`)
+
+        // model.addChild(childName);
     }
 
     processLightCommand(scene: SceneData, parameters: string[]) {
@@ -339,7 +400,6 @@ class ScenesManager {
         let newModel = await objFileLoader.getModel(objectFile);
         if (newModel !== undefined) {
             scene.models.set(objectName, newModel);
-            this.processTransformations(scene, newModel, objectName);
         }
         scene.modelsLoaded += 1;
     }

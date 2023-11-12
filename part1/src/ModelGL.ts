@@ -22,6 +22,7 @@ class ModelGL {
     modelPath: string = '';
     modelName: string = '';
     shaderName: string = '';
+    children: Array<ModelGL> = [];
 
     positionBuffer: WebGLBuffer | null = null;
     normalBuffer: WebGLBuffer | null = null;
