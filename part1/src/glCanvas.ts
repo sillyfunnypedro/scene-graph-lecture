@@ -58,7 +58,7 @@ export const setupCanvas = function () {
 
 // for now the scene is contained here in glCanvas when a scene is pulled out
 // then this needs to go outside of this file.
-export function updateSceneData(model: ModelGL | null, camera: Camera | null): void {
+export function updateSceneData(camera: Camera | null): void {
 
     let currentScene = scenesManager.getScene(scenesManager.getActiveScene());
     if (currentScene === undefined) {
@@ -66,7 +66,7 @@ export function updateSceneData(model: ModelGL | null, camera: Camera | null): v
         return;
     }
     currentScene.camera = camera;
-    if (model !== null && camera !== null) {
+    if (camera !== null) {
         requestUpdate();
     }
 }
@@ -91,7 +91,8 @@ function compileProgram(gl: WebGLRenderingContext, model: ModelGL) {
     const fragmentShaderName = model.getFragmentShaderName();
 
 
-
+    console.log(`vertexShaderName: ${vertexShaderName}`);
+    console.log(`fragmentShaderName: ${fragmentShaderName}`);
 
     // ******************************************************
     // Create the vertex shader program

@@ -216,6 +216,9 @@ class ModelParser {
         for (let line of lines) {
             // strip off any leading white space
             line = line.trim();
+
+            // get rid of any double or multiple spaces
+            line = line.replace(/\s\s+/g, ' ');
             let tokens: string[] = line.split(" ");
             if (tokens[0] === "v") {
                 this._vertices.push(parseFloat(tokens[1]));

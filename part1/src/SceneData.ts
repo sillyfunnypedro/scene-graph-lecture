@@ -42,6 +42,23 @@ class SceneData {
         return this.modelsLoading === this.modelsLoaded;
     }
 
+    getSceneObjects(): string[] {
+
+        let objectNames = this.models.keys();
+
+        // make a copy of the object names
+        let objectNamesCopy: string[] = [];
+        for (let objectName of objectNames) {
+            objectNamesCopy.push(objectName);
+        }
+        return objectNamesCopy;
+    }
+
+    getObject(objectName: string): ModelGL | undefined {
+        return this.models.get(objectName);
+    }
+
+
 
 
 }

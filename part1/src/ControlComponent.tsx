@@ -21,14 +21,14 @@ interface ControlComponentProps {
     renderObject: string;
     updateRenderObject: (newObject: string) => void;
 
-    modelGL: ModelGl | null;
+    modelGLDeprecated: ModelGl | null;
 }
 
 
 // define the ControlComponent
 function ControlComponent({ renderObject,
-    updateRenderObject, modelGL }: ControlComponentProps) {
-
+    updateRenderObject, modelGLDeprecated }: ControlComponentProps) {
+    const [modelGL, setModelGL] = useState<ModelGl | null>(null);
     const [translateX, setTranslateX] = useState(modelGL?.translateX ?? 0);
     const [translateY, setTranslateY] = useState(modelGL?.translateX ?? 0);
     const [translateZ, setTranslateZ] = useState(modelGL?.translateX ?? 0);
@@ -39,8 +39,25 @@ function ControlComponent({ renderObject,
     const [scaleY, setScaleY] = useState(modelGL?.scaleY ?? 1);
     const [scaleZ, setScaleZ] = useState(modelGL?.scaleZ ?? 1);
     const [uniformScale, setUniformScale] = useState(true);
-    const [sceneName, setSceneName] = useState("")
+    const [sceneName, setSceneName] = useState("");
 
+    function updateControlledModelGL(modelName: string) {
+        if (sceneName === "") {
+            return;
+        }
+
+        const currentScene = scenesManager.getScene(sceneName);
+        if (!currentScene) {
+            return;
+        }
+
+        const newModel = currentScene.getObject(modelName);
+        if (!newModel) {
+            return;
+        }
+        updateRenderObject(modelName);
+        setModelGL(newModel);
+    }
 
     function updateState() {
         setTranslateX(modelGL?.translateX ?? 0);
@@ -182,6 +199,7 @@ function ControlComponent({ renderObject,
      * @returns three sliders for translation
      */
     function makeTranslateSliders() {
+
         return (
             <div>
                 <table className="tableWidth">
@@ -273,6 +291,7 @@ function ControlComponent({ renderObject,
      * @returns three sliders for rotation
      * */
     function makeRotationSliders() {
+
         return (
             <div>
                 <table className="tableWidth">
@@ -361,7 +380,21 @@ function ControlComponent({ renderObject,
      * @returns HTML component with as many buttons as there are strings in the array
      */
     function makeObjectButtons(title: string, value: string, callback: (model: string) => void) {
-        const strings = Array.from(objectFileMap.keys());
+
+        const currentSceneName = scenesManager.getActiveScene();
+        const currentScene = scenesManager.getScene(currentSceneName);
+        let objects: string[] = [];
+
+
+        if (currentScene !== null && currentScene !== undefined) {
+            objects = currentScene.getSceneObjects();
+        }
+
+        if (renderObject === "") {
+            updateRenderObject(objects[0]);
+        }
+
+
         let buttonCount = 0;
         // put five buttons on a row
         function makeRow() {
@@ -378,7 +411,7 @@ function ControlComponent({ renderObject,
                         <tr>
                             <th className="leftAlign">{title}</th>
                             <th className="rightAlign">
-                                {strings.map((string) => (
+                                {objects.map((string) => (
                                     <React.Fragment key={string}>
                                         <button
                                             key={string}
@@ -439,7 +472,7 @@ function ControlComponent({ renderObject,
                             <hr className="lineWidth" />
                             {makeScenesButtons()}
                             <hr className="lineWidth" />
-                            {makeObjectButtons("Objects:", renderObject, updateRenderObject)}
+                            {makeObjectButtons("Objects:", renderObject, updateControlledModelGL)}
                             <hr className="lineWidth" />
                         </th>
                         <th className="rightAlign">

@@ -1,14 +1,17 @@
+object sun sun
+object mercury mercury
+scale mercury 0.3 0.3 0.3
+translate mercury 3 0 0 
 
+object earth earth
+scale earth 0.5 0.5 0.5
+translate earth 4 0 0
 
-object cube cube-tex
-scale cube 1 1 1
+object moon rock
+scale moon 0.1 0.1 0.1
+translate moon 1 0 0
+child earth moon
 
-object cube2 cube-tex
-scale cube2 1 1 1
-translate cube2 0 5 0
-rotate cube z 45
-rotate cube2 y 45
+child sun earth
+child sun mercury
 
-
-
-#child cube cube2

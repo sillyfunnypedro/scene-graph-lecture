@@ -39,6 +39,7 @@ class ScenesManager {
     }
 
 
+
     // functions for the UI.  These functions are called by the UI
     getScenes(): string[] {
         return this.sceneNames;

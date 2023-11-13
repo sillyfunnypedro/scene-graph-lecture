@@ -50,23 +50,18 @@ function App() {
   useEffect(() => {
     setRenderObject('tri-plain');
     setupCanvas();
-    updateSceneData(modelGL, camera);
+    updateSceneData(camera);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 
   // load the obj file and then use the model in the promise to set the modelGL
   useEffect(() => {
-    let objPromise = objLoader.getModel(renderObject)
-    objPromise.then((model) => {
-      if (!model) {
-        console.log('no model');
-        return;
-      }
-      setModelGL(model);
-      updateSceneData(model, camera);
 
-    });
+    //(model);
+    updateSceneData(camera);
+
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [renderObject]);
 
@@ -78,7 +73,7 @@ function App() {
     }
     setCamera(newCamera);
 
-    updateSceneData(modelGL, newCamera);
+    updateSceneData(newCamera);
   }
 
 
@@ -111,7 +106,7 @@ function App() {
       <ControlComponent
         renderObject={renderObject}
         updateRenderObject={updateRenderObject}
-        modelGL={modelGL}
+        modelGLDeprecated={modelGL}
       />
 
 
