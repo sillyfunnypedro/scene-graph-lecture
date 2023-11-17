@@ -566,7 +566,7 @@ function renderHierarchy(model: ModelGL, parentMatrix: mat4): void {
     let fromParentRotateMatrix = mat4.create();
     mat4.rotateX(fromParentRotateMatrix, fromParentRotateMatrix, (fromParentRotate[0] / 180) * Math.PI);
     mat4.rotateY(fromParentRotateMatrix, fromParentRotateMatrix, (fromParentRotate[1] / 180) * Math.PI);
-    mat4.rotateZ(fromParentRotateMatrix, fromParentRotateMatrix, (fromParentRotate[2] / 180 * Math.PI));
+    mat4.rotateZ(fromParentRotateMatrix, fromParentRotateMatrix, (fromParentRotate[2] / 180) * Math.PI);
 
     let fromParentMatrix = mat4.create();
     mat4.multiply(fromParentMatrix, fromParentRotateMatrix, fromParentTranslateMatrix,);
