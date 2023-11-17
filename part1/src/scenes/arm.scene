@@ -9,25 +9,7 @@ light point 5 5 5 1 1 1
 object base small_sphere
 object rod1 rod
 
-child base rod1 0 0 0 0 0 0
-
-object joint1 small_sphere
-child rod1 joint1 0 2 0 0 0 0
-
-object rod2 rod
-child joint1 rod2 0 0 0 0 0 0
-
-object joint2 small_sphere
-child rod2 joint2 0 2 0 0 0 0
-
-object rod3 rod
-
-child joint2 rod3 0 0 0 0 0 0
-
-object sun sun
-scale sun 2 2 2
-
-child rod3 sun 0 2 0 0 0 0
+#make the sun be on a 3 rod stand 
 
 
 #object mercury mercury
@@ -47,4 +29,4 @@ child rod3 sun 0 2 0 0 0 0
 #child sun earth 4 0 0 0 0 0
 
 
-#child sun mercury 3 0 0 0 0 0
+child sun mercury 3 0 0 0 0 0
