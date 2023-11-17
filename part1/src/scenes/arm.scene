@@ -1,0 +1,50 @@
+object normal_square normal_square
+camera 0 15 15 0 0 0 0 1 0
+light point -5 5 -5 1 1 1
+light point -5 5 5 1 1 1
+light point 5 5 -5 1 1 1
+light point 5 5 5 1 1 1
+
+
+object base small_sphere
+object rod1 rod
+
+child base rod1 0 0 0 0 0 0
+
+object joint1 small_sphere
+child rod1 joint1 0 2 0 0 0 0
+
+object rod2 rod
+child joint1 rod2 0 0 0 0 0 0
+
+object joint2 small_sphere
+child rod2 joint2 0 2 0 0 0 0
+
+object rod3 rod
+
+child joint2 rod3 0 0 0 0 0 0
+
+object sun sun
+scale sun 2 2 2
+
+child rod3 sun 0 2 0 0 0 0
+
+
+#object mercury mercury
+#scale mercury 0.3 0.3 0.3
+
+
+#object earth earth
+#scale earth 0.5 0.5 0.5
+
+
+#object moon rock
+#scale moon 0.1 0.1 0.1
+
+
+#child earth moon 1 0 0 0 0 0
+
+#child sun earth 4 0 0 0 0 0
+
+
+#child sun mercury 3 0 0 0 0 0

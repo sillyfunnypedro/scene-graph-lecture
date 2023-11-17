@@ -17,6 +17,8 @@ export const objectFileMap: Map<string, string> = new Map([
     ["mercury", "mercury/sphere.obj"],
     ["earth", "earth/sphere.obj"],
     ["rock", "rock/sphere.obj"],
+    ["rod", "rod/rod.obj"],
+    ["small_sphere", "small_sphere/sphere.obj"],
     //["clown_fish", "clown_fish/13008_Clown_Goby_Citrinis_v1_l3.obj"],
     // ["capsule", "capsule/capsule.obj"],
     // ["chapel", "chapel/chapel_obj.obj"],

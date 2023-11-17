@@ -10,7 +10,7 @@ import SceneData from './SceneData';
 import ScenesManager from './ScenesManager';
 import { GLPointLight, GLLights } from './GLLights';
 import { request } from 'http';
-import { mat4 } from 'gl-matrix';
+import { mat4, vec3 } from 'gl-matrix';
 
 
 // measure the FPS
@@ -531,27 +531,78 @@ function renderLoop(): void {
         }
 
     }
+    // ******************************************************
+    // Calculate the FPS
+    // ******************************************************
+    frameNumber++;
+    const now = performance.now();
+
+    if (now - lastTime > 1000) {
+        fps = frameNumber;
+        console.log("FPS: " + fps);
+        frameNumber = 0;
+        lastTime = now;
+    }
     requestUpdate();
 }
 
-// the parent has been rendered (it is the model)
+// In this basic implementation of the hierarchical scene model we are not going to be using translate and rotate for the objects
+// rather we will be using the fromParent data in the model to calculate the translate and rotate for the object.
+// the parent matrix will be a produc of all the fromParent data for the object and all of its parents.
 function renderHierarchy(model: ModelGL, parentMatrix: mat4): void {
 
+    // in this version the only thing in this matrix is the scale.   
     let modelMatrix = model.getModelMatrix();
+
+    // let us get the data from the parent
+    let fromParentTranslate = model.fromParentTranslate;
+    let fromParentRotate = model.fromParentRotate;
+    // For any root objects these will both be 0
+
+    // now we need to calculate the fromParentMatrix that we will use to calculate the translation and rotation of the object
+    let fromParentTranslateMatrix = mat4.create();
+    mat4.translate(fromParentTranslateMatrix, fromParentTranslateMatrix, vec3.fromValues(fromParentTranslate[0], fromParentTranslate[1], fromParentTranslate[2]));
+
+    let fromParentRotateMatrix = mat4.create();
+    mat4.rotateX(fromParentRotateMatrix, fromParentRotateMatrix, (fromParentRotate[0] / 180) * Math.PI);
+    mat4.rotateY(fromParentRotateMatrix, fromParentRotateMatrix, (fromParentRotate[1] / 180) * Math.PI);
+    mat4.rotateZ(fromParentRotateMatrix, fromParentRotateMatrix, (fromParentRotate[2] / 180 * Math.PI));
+
+    let fromParentMatrix = mat4.create();
+    mat4.multiply(fromParentMatrix, fromParentRotateMatrix, fromParentTranslateMatrix,);
+
+
+    // now we need to multiply the fromParentMatrix by the parentMatrix
+    mat4.multiply(fromParentMatrix, parentMatrix, fromParentMatrix,);
+
+
     let localMatrix = mat4.create();
     // prepare the model matrix for this object
-    mat4.multiply(localMatrix, parentMatrix, modelMatrix);
+    mat4.multiply(localMatrix, fromParentMatrix, modelMatrix);
+
+    // we stash the matrix in the model where our renderers can get it.
+    // note that this does not overwrite the modelMatrix in the model
     model.setHierarichalMatrix(localMatrix);
 
+    // now render the model
     renderModel(model);
 
+    // clean up the hierarchical matrix
     model.setHierarichalMatrix(null);
     cleanUpTextures(gl!, model);
 
 
     // now render all children and we are done
     for (let child of model.children) {
-        renderHierarchy(child, localMatrix);
+
+        // In typescript arrays are passed as reference so to make sure ther is no polution
+        // we make a copy of the matrix so the child does not have to worry about it.
+        let hierarchyMatrix = mat4.create();
+        mat4.copy(hierarchyMatrix, fromParentMatrix);
+
+        renderHierarchy(child, hierarchyMatrix);
+
+
     }
 }
 
@@ -679,18 +730,7 @@ function renderModel(model: ModelGL, parentMatrix: mat4 | null = null): void {
 
 
 
-    // ******************************************************
-    // Calculate the FPS
-    // ******************************************************
-    frameNumber++;
-    const now = performance.now();
 
-    if (now - lastTime > 1000) {
-        fps = frameNumber;
-        console.log("FPS: " + fps);
-        frameNumber = 0;
-        lastTime = now;
-    }
 
     //requestAnimationFrame(checkForUpdates);
 }

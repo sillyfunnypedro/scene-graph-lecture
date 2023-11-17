@@ -24,6 +24,8 @@ class ModelGL {
     shaderName: string = '';
     children: Array<ModelGL> = [];
     parent: ModelGL | null = null;
+    fromParentTranslate: number[] = [0, 0, 0];
+    fromParentRotate: number[] = [0, 0, 0];
 
     positionBuffer: WebGLBuffer | null = null;
     normalBuffer: WebGLBuffer | null = null;
@@ -49,6 +51,103 @@ class ModelGL {
     shaderProgram: WebGLProgram | null = null;
     loaded: boolean = false;
 
+
+    public setRotateX(degrees: number): void {
+        if (this.parent !== null || this.children.length > 0) {
+            this.fromParentRotate[0] = degrees;
+        } else {
+            this.rotateX = degrees;
+        }
+    }
+
+    public getRotateX(): number {
+        if (this.parent !== null || this.children.length > 0) {
+            return this.fromParentRotate[0];
+        } else {
+            return this.rotateX;
+        }
+    }
+
+    public setRotateY(degrees: number): void {
+        if (this.parent !== null || this.children.length > 0) {
+            this.fromParentRotate[1] = degrees;
+        } else {
+            this.rotateY = degrees;
+        }
+    }
+
+    public getRotateY(): number {
+        if (this.parent !== null || this.children.length > 0) {
+            return this.fromParentRotate[1];
+        } else {
+            return this.rotateY;
+        }
+    }
+
+    public setRotateZ(degrees: number): void {
+        if (this.parent !== null || this.children.length > 0) {
+            this.fromParentRotate[2] = degrees;
+        } else {
+            this.rotateZ = degrees;
+        }
+    }
+
+    public getRotateZ(): number {
+        if (this.parent !== null || this.children.length > 0) {
+            return this.fromParentRotate[2];
+        } else {
+            return this.rotateZ;
+        }
+    }
+
+
+    public setTranslateX(scale: number): void {
+        if (this.parent !== null || this.children.length > 0) {
+            this.fromParentTranslate[0] = scale;
+        } else {
+            this.translateX = scale;
+        }
+    }
+
+    public getTranslateX(): number {
+        if (this.parent !== null || this.children.length > 0) {
+            return this.fromParentTranslate[0];
+        } else {
+            return this.translateX;
+        }
+    }
+
+    public setTranslateY(scale: number): void {
+        if (this.parent !== null || this.children.length > 0) {
+            this.fromParentTranslate[1] = scale;
+        } else {
+            this.translateY = scale;
+        }
+    }
+
+    public getTranslateY(): number {
+        if (this.parent !== null || this.children.length > 0) {
+            return this.fromParentTranslate[1];
+        } else {
+            return this.translateY;
+        }
+    }
+
+    public setTranslateZ(scale: number): void {
+        if (this.parent !== null || this.children.length > 0) {
+            this.fromParentTranslate[2] = scale;
+        } else {
+            this.translateZ = scale;
+        }
+    }
+
+    public getTranslateZ(): number {
+        if (this.parent !== null || this.children.length > 0) {
+            return this.fromParentTranslate[2];
+        } else {
+            return this.translateZ;
+        }
+    }
 
     public get hasDiffuseMap(): boolean {
         if (this.material === undefined) {

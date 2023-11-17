@@ -219,6 +219,7 @@ class ScenesManager {
         let model_name = parameters[1];
         let child_name = parameters[2];
 
+
         let command_string = parameters.join(' ');
         this.addPostLoadCommand(scene, model_name, command_string);
     }
@@ -319,14 +320,28 @@ class ScenesManager {
         let childName = parameters[1];
         let childModel = scene.models.get(childName);
 
+        if (parameters.length < 5) {
+            console.log(`not enough parameters for child ${childName}`);
+            throw new Error(`not enough parameters for child ${childName}`);
+        }
+
+
+        let childXtranslate = parseFloat(parameters[2]);
+        let childYtranslate = parseFloat(parameters[3]);
+        let childZtranslate = parseFloat(parameters[4]);
+
+
         if (childModel === undefined) {
             console.log(`child ${childName} not found`);
             throw new Error(`child ${childName} not found`);
         }
 
+        console.log(`translation for child is ${childXtranslate} ${childYtranslate} ${childZtranslate}`)
+
         console.log(`adding child ${childName} to ${model}`)
         model.addChild(childModel);
         childModel.parent = model;
+        childModel.fromParentTranslate = [childXtranslate, childYtranslate, childZtranslate];
         // model.addChild(childName);
     }
 

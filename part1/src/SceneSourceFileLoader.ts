@@ -3,6 +3,7 @@ import textured_triangle from './scenes/textured_triangle.scene';
 import normal_square from './scenes/normal_square.scene';
 import house_windmill from './scenes/house_windmill.scene';
 import graph from './scenes/graph.scene';
+import arm from './scenes/arm.scene';
 import ScenesManager from './ScenesManager';
 
 
@@ -43,6 +44,7 @@ export function loadAndCacheSceneSourceFiles() {
     //loadSceneSourceFile('normal_square', normal_square)
     //loadSceneSourceFile('house_windmill', house_windmill)
     loadSceneSourceFile('graph', graph)
+    loadSceneSourceFile('arm', arm)
 
 }
 

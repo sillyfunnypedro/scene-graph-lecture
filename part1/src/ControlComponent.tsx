@@ -60,12 +60,12 @@ function ControlComponent({ renderObject,
     }
 
     function updateState() {
-        setTranslateX(modelGL?.translateX ?? 0);
-        setTranslateY(modelGL?.translateY ?? 0);
-        setTranslateZ(modelGL?.translateZ ?? 0);
-        setRotateX(modelGL?.rotateX ?? 0);
-        setRotateY(modelGL?.rotateY ?? 0);
-        setRotateZ(modelGL?.rotateZ ?? 0);
+        setTranslateX(modelGL?.getTranslateX() ?? 0);
+        setTranslateY(modelGL?.getTranslateY() ?? 0);
+        setTranslateZ(modelGL?.getTranslateZ() ?? 0);
+        setRotateX(modelGL?.getRotateX() ?? 0);
+        setRotateY(modelGL?.getRotateY() ?? 0);
+        setRotateZ(modelGL?.getRotateZ() ?? 0);
         setScaleX(modelGL?.scaleX ?? 1);
         setScaleY(modelGL?.scaleY ?? 1);
         setScaleZ(modelGL?.scaleZ ?? 1);
@@ -85,13 +85,16 @@ function ControlComponent({ renderObject,
         }
         switch (axis) {
             case "x":
-                modelGL.rotateX = value;
+                modelGL.setRotateX(value);
+                setRotateX(value);
                 break;
             case "y":
-                modelGL.rotateY = value;
+                modelGL.setRotateY(value);
+                setRotateY(value);
                 break;
             case "z":
-                modelGL.rotateZ = value;
+                modelGL.setRotateZ(value);
+                setRotateZ(value);
                 break;
         }
         updateState();
@@ -112,13 +115,16 @@ function ControlComponent({ renderObject,
         }
         switch (axis) {
             case "x":
-                modelGL.translateX = numValue;
+                modelGL.setTranslateX(numValue);
+                setTranslateX(numValue);
                 break;
             case "y":
-                modelGL.translateY = numValue;
+                modelGL.setTranslateY(numValue);
+                setTranslateY(numValue);
                 break;
             case "z":
-                modelGL.translateZ = numValue;
+                modelGL.setTranslateZ(numValue);
+                setTranslateZ(numValue);
                 break;
         }
         updateState();
@@ -356,6 +362,8 @@ function ControlComponent({ renderObject,
                                             onClick={() => updateSceneName(scene)}
                                             style={{
                                                 backgroundColor: (scene === currentScene) ? 'blue' : 'gray',
+                                                fontSize: '20px',
+                                                fontWeight: 'bold',
                                             }}
                                         >
                                             {scene}
@@ -418,6 +426,8 @@ function ControlComponent({ renderObject,
                                             onClick={() => callback(string)}
                                             style={{
                                                 backgroundColor: value === string ? 'blue' : 'gray',
+                                                fontSize: '20px',
+                                                fontWeight: 'bold',
                                             }}
                                         >
                                             {string}
